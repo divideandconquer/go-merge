@@ -1,5 +1,5 @@
 # go-merge
-go-merge is a golang library for recursively merging data.  Is will merge and overwrite maps, structs, and other basic golang types
+go-merge is a golang library for recursively merging data.  It will merge and overwrite maps, structs, and other basic golang types
 as long as the base data and the override data are of a similar structure.
 
 ## Usage
