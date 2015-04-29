@@ -1,7 +1,6 @@
 package merge
 
 import (
-	"log"
 	"reflect"
 	"testing"
 
@@ -342,7 +341,30 @@ func TestUnit_Merge_AlternatePath_Map(t *testing.T) {
 
 	ret := merge.Merge(baseData, overrideData)
 
-	log.Printf("%#v", ret) // prints:
+	if !reflect.DeepEqual(ret, expected) {
+		t.Errorf("Actual ( %#v ) does not match expected ( %#v )", ret, expected)
+	}
+}
+
+func TestUnit_Merge_AlternatePath_MapInterface(t *testing.T) {
+	base := make(map[string]map[string]interface{})
+	base["Config"] = make(map[string]interface{})
+	base["Config"]["Test"] = "this is a test value"
+	base["Config"]["Test2"] = "this is also a test value"
+
+	override := make(map[string]map[string]interface{})
+	override["Config"] = make(map[string]interface{})
+	override["Config"]["foo"] = "bar"
+	override["Config"]["Test2"] = "baz"
+
+	expected := make(map[string]map[string]interface{})
+	expected["Config"] = make(map[string]interface{})
+	expected["Config"]["foo"] = "bar"
+	expected["Config"]["Test"] = "this is a test value"
+	expected["Config"]["Test2"] = "baz"
+
+	ret := merge.Merge(base, override)
+
 	if !reflect.DeepEqual(ret, expected) {
 		t.Errorf("Actual ( %#v ) does not match expected ( %#v )", ret, expected)
 	}

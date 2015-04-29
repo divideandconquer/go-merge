@@ -31,7 +31,10 @@ func mergeRecursive(base, override reflect.Value) reflect.Value {
 			newVal := mergeRecursive(base.Field(i), override.Field(i))
 
 			//attempt to set that merged value on our result struct
-			if result.Elem().Field(i).CanSet() {
+			if result.Elem().Field(i).CanSet() && newVal.IsValid() {
+				if newVal.Kind() == reflect.Ptr {
+					newVal = newVal.Elem()
+				}
 				result.Elem().Field(i).Set(newVal)
 			}
 		}
@@ -48,20 +51,22 @@ func mergeRecursive(base, override reflect.Value) reflect.Value {
 		}
 
 		// Override with values from override if they exist
-		for _, key := range override.MapKeys() {
-			overrideVal := override.MapIndex(key)
-			baseVal := base.MapIndex(key)
-			if !overrideVal.IsValid() {
-				continue
-			}
+		if override.Kind() == reflect.Map {
+			for _, key := range override.MapKeys() {
+				overrideVal := override.MapIndex(key)
+				baseVal := base.MapIndex(key)
+				if !overrideVal.IsValid() {
+					continue
+				}
 
-			// Merge the values and set in the result
-			newVal := mergeRecursive(baseVal, overrideVal)
-			if newVal.Kind() == reflect.Ptr {
-				result.SetMapIndex(key, newVal.Elem())
+				// Merge the values and set in the result
+				newVal := mergeRecursive(baseVal, overrideVal)
+				if newVal.Kind() == reflect.Ptr {
+					result.SetMapIndex(key, newVal.Elem())
 
-			} else {
-				result.SetMapIndex(key, newVal)
+				} else {
+					result.SetMapIndex(key, newVal)
+				}
 			}
 		}
 
