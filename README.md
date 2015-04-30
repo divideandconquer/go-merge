@@ -13,25 +13,29 @@ go get github.com/divideandconquer/go-merge/merge
 Then you can import it in your code and use it as follows:
 
 ```golang
+package main
+
 import (
 	"log"
 	"github.com/divideandconquer/go-merge/merge"
 )
 
-// ...
+func main() {
+	baseData := make(map[string]string)
+	baseData["test"] = "foo"
+	baseData["test2"] = "bar"
 
-baseData := make(map[string]string)
-baseData["test"] = "foo"
-baseData["test2"] = "bar"
+	overrideData := make(map[string]string)
+	overrideData["test2"] = "override"
 
-overrideData := make(map[string]string)
-overrideData["test2"] = "override"
+	result := merge.Merge(baseData, overrideData)
 
-result := merge.Merge(baseData, overrideData)
-
-log.Printf("%#v", result) // prints: map[string]string{"test":"foo", "test2":"override"}
+	log.Printf("%#v", result) // prints: map[string]string{"test":"foo", "test2":"override"}
+}
 
 ```
+
+For more examples of usage check the [unit tests](/merge/merge_test.go).
 
 ## Contributing
 
