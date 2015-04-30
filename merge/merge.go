@@ -27,15 +27,18 @@ func mergeRecursive(base, override reflect.Value) reflect.Value {
 		// setup our result struct
 		result = reflect.New(base.Type())
 		for i, n := 0, base.NumField(); i < n; i++ {
-			// get the merged value of each field
-			newVal := mergeRecursive(base.Field(i), override.Field(i))
+			// We cant set private fields so don't recurse on them
+			if result.Elem().Field(i).CanSet() {
+				// get the merged value of each field
+				newVal := mergeRecursive(base.Field(i), override.Field(i))
 
-			//attempt to set that merged value on our result struct
-			if result.Elem().Field(i).CanSet() && newVal.IsValid() {
-				if newVal.Kind() == reflect.Ptr {
-					newVal = newVal.Elem()
+				//attempt to set that merged value on our result struct
+				if result.Elem().Field(i).CanSet() && newVal.IsValid() {
+					if newVal.Kind() == reflect.Ptr && result.Elem().Field(i).Kind() != reflect.Ptr {
+						newVal = newVal.Elem()
+					}
+					result.Elem().Field(i).Set(newVal)
 				}
-				result.Elem().Field(i).Set(newVal)
 			}
 		}
 

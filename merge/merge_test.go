@@ -407,3 +407,51 @@ func TestUnit_Merge_AlternatePath_StructMapStruct(t *testing.T) {
 		t.Errorf("Actual ( %#v ) does not match expected ( %#v )", ret, es)
 	}
 }
+
+func TestUnit_Merge_AlternatePath_StructPointer(t *testing.T) {
+
+	type innerStruct struct {
+		InnerVal string
+	}
+	type testStruct struct {
+		Foo string
+		Bar *innerStruct
+	}
+
+	i1 := &innerStruct{"inner"}
+	base := testStruct{"bar", i1}
+
+	i2 := &innerStruct{"inner2"}
+	override := testStruct{"", i2}
+
+	expected := testStruct{"bar", i2}
+
+	ret := Merge(base, override)
+	if ret.(*testStruct).Foo != expected.Foo || ret.(*testStruct).Bar.InnerVal != expected.Bar.InnerVal {
+		t.Errorf("Actual ( %#v ) does not match expected ( %#v )", ret, expected)
+	}
+}
+
+func TestUnit_Merge_AlternatePath_StructPrivate(t *testing.T) {
+
+	type innerStruct struct {
+		InnerVal string
+	}
+	type testStruct struct {
+		Foo string
+		bar innerStruct
+	}
+
+	i1 := innerStruct{"inner"}
+	base := testStruct{"bar", i1}
+
+	i2 := innerStruct{"inner2"}
+	override := testStruct{"", i2}
+
+	expected := testStruct{"bar", innerStruct{}}
+
+	ret := Merge(base, override)
+	if ret.(*testStruct).Foo != expected.Foo || ret.(*testStruct).bar.InnerVal != expected.bar.InnerVal {
+		t.Errorf("Actual ( %#v ) does not match expected ( %#v )", ret, expected)
+	}
+}
