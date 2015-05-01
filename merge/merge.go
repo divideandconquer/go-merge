@@ -25,8 +25,14 @@ func mergeRecursive(base, override reflect.Value) reflect.Value {
 		case reflect.Struct:
 			fallthrough
 		case reflect.Map:
-			// Pointers to complex types should recurse
-			result = mergeRecursive(base.Elem(), override.Elem())
+			// Pointers to complex types should recurse if they aren't nil
+			if base.IsNil() {
+				result = override
+			} else if override.IsNil() {
+				result = base
+			} else {
+				result = mergeRecursive(base.Elem(), override.Elem())
+			}
 		default:
 			// Pointers to basic types should just override
 			if isEmptyValue(override) {

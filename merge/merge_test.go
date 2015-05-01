@@ -491,3 +491,47 @@ func TestUnit_Merge_AlternatePath_StructWithStringNilPointers(t *testing.T) {
 		t.Errorf("Actual ( %#v ) does not match expected ( %#v )", ret, expected)
 	}
 }
+
+func TestUnit_Merge_AlternatePath_StructWithStructNilPointers(t *testing.T) {
+
+	type innerStruct struct {
+		InnerVal string
+	}
+	type testStruct struct {
+		Foo string
+		Bar *innerStruct
+	}
+
+	bs := innerStruct{"bar"}
+	base := testStruct{"foo", &bs}
+
+	override := testStruct{"foo2", nil}
+	expected := testStruct{"foo2", &bs}
+
+	ret := Merge(base, override)
+	if ret.(*testStruct).Foo != expected.Foo || ret.(*testStruct).Bar != expected.Bar {
+		t.Errorf("Actual ( %#v ) does not match expected ( %#v )", ret, expected)
+	}
+}
+
+func TestUnit_Merge_AlternatePath_StructWithStructNilPointersBase(t *testing.T) {
+
+	type innerStruct struct {
+		InnerVal string
+	}
+	type testStruct struct {
+		Foo string
+		Bar *innerStruct
+	}
+
+	bs := innerStruct{"bar"}
+	base := testStruct{"foo", nil}
+
+	override := testStruct{"foo2", &bs}
+	expected := testStruct{"foo2", &bs}
+
+	ret := Merge(base, override)
+	if ret.(*testStruct).Foo != expected.Foo || ret.(*testStruct).Bar != expected.Bar {
+		t.Errorf("Actual ( %#v ) does not match expected ( %#v )", ret, expected)
+	}
+}
