@@ -17,9 +17,26 @@ func mergeRecursive(base, override reflect.Value) reflect.Value {
 
 	switch base.Kind() {
 	case reflect.Ptr:
-		fallthrough
+		switch base.Elem().Kind() {
+		case reflect.Ptr:
+			fallthrough
+		case reflect.Interface:
+			fallthrough
+		case reflect.Struct:
+			fallthrough
+		case reflect.Map:
+			// Pointers to complex types should recurse
+			result = mergeRecursive(base.Elem(), override.Elem())
+		default:
+			// Pointers to basic types should just override
+			if isEmptyValue(override) {
+				result = base
+			} else {
+				result = override
+			}
+		}
 	case reflect.Interface:
-		// Pointers and Interfaces should just be unwrapped and recursed through
+		// Interfaces should just be unwrapped and recursed through
 		result = mergeRecursive(base.Elem(), override.Elem())
 
 	case reflect.Struct:
@@ -36,6 +53,8 @@ func mergeRecursive(base, override reflect.Value) reflect.Value {
 				if result.Elem().Field(i).CanSet() && newVal.IsValid() {
 					if newVal.Kind() == reflect.Ptr && result.Elem().Field(i).Kind() != reflect.Ptr {
 						newVal = newVal.Elem()
+					} else if result.Elem().Field(i).Kind() == reflect.Ptr && newVal.Kind() != reflect.Ptr && newVal.CanAddr() {
+						newVal = newVal.Addr()
 					}
 					result.Elem().Field(i).Set(newVal)
 				}
