@@ -319,7 +319,7 @@ func TestUnit_Merge_AlternatePath_ArrayBothSet(t *testing.T) {
 func TestUnit_Merge_AlternatePath_Pointers(t *testing.T) {
 	a := 10
 	b := 5
-	expected := b
+	expected := &b
 	ret := Merge(&a, &b)
 
 	if !reflect.DeepEqual(ret, expected) {
@@ -452,6 +452,42 @@ func TestUnit_Merge_AlternatePath_StructPrivate(t *testing.T) {
 
 	ret := Merge(base, override)
 	if ret.(*testStruct).Foo != expected.Foo || ret.(*testStruct).bar.InnerVal != expected.bar.InnerVal {
+		t.Errorf("Actual ( %#v ) does not match expected ( %#v )", ret, expected)
+	}
+}
+
+func TestUnit_Merge_AlternatePath_StructWithStringPointers(t *testing.T) {
+	type testStruct struct {
+		Foo string
+		Bar *string
+	}
+
+	bs := "bar"
+	base := testStruct{Foo: "foo"}
+
+	override := testStruct{"foo2", &bs}
+	expected := testStruct{"foo2", &bs}
+
+	ret := Merge(base, override)
+	if ret.(*testStruct).Foo != expected.Foo || ret.(*testStruct).Bar != expected.Bar {
+		t.Errorf("Actual ( %#v ) does not match expected ( %#v )", ret, expected)
+	}
+}
+
+func TestUnit_Merge_AlternatePath_StructWithStringNilPointers(t *testing.T) {
+	type testStruct struct {
+		Foo string
+		Bar *string
+	}
+
+	bs := "bar"
+	base := testStruct{"foo", &bs}
+
+	override := testStruct{"foo2", nil}
+	expected := testStruct{"foo2", &bs}
+
+	ret := Merge(base, override)
+	if ret.(*testStruct).Foo != expected.Foo || ret.(*testStruct).Bar != expected.Bar {
 		t.Errorf("Actual ( %#v ) does not match expected ( %#v )", ret, expected)
 	}
 }
