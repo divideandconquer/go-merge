@@ -71,6 +71,7 @@ func mergeRecursive(base, override reflect.Value) reflect.Value {
 		// For Maps we copy the base data, and then replace it with merged data
 		// We use two for loops to make sure all map keys from base and all keys from
 		// override exist in the result just in case one of the maps is sparse.
+		elementsAreValues := base.Type().Elem().Kind() != reflect.Ptr
 
 		result = reflect.MakeMap(base.Type())
 		// Copy from base first
@@ -89,7 +90,7 @@ func mergeRecursive(base, override reflect.Value) reflect.Value {
 
 				// Merge the values and set in the result
 				newVal := mergeRecursive(baseVal, overrideVal)
-				if newVal.Kind() == reflect.Ptr {
+				if elementsAreValues && newVal.Kind() == reflect.Ptr {
 					result.SetMapIndex(key, newVal.Elem())
 
 				} else {
