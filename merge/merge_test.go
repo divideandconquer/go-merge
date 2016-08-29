@@ -414,6 +414,32 @@ func TestUnit_Merge_AlternatePath_MapInterface(t *testing.T) {
 	}
 }
 
+func TestUnit_Merge_AlternatePath_MapInterfaceEmptyValue(t *testing.T) {
+	base := make(map[string]map[string]interface{})
+	base["Config"] = make(map[string]interface{})
+	base["Config"]["Test"] = "this is a test value"
+	base["Config"]["Test2"] = "this is also a test value"
+
+	override := make(map[string]map[string]interface{})
+	override["Config"] = make(map[string]interface{})
+	override["Config"]["foo"] = "bar"
+	override["Config"]["Test2"] = "baz"
+	override["Config"]["Test3"] = nil
+
+	expected := make(map[string]map[string]interface{})
+	expected["Config"] = make(map[string]interface{})
+	expected["Config"]["foo"] = "bar"
+	expected["Config"]["Test"] = "this is a test value"
+	expected["Config"]["Test2"] = "baz"
+	expected["Config"]["Test3"] = nil
+
+	ret := merge.Merge(base, override)
+
+	if !reflect.DeepEqual(ret, expected) {
+		t.Errorf("Actual ( %#v ) does not match expected ( %#v )", ret, expected)
+	}
+}
+
 func TestUnit_Merge_AlternatePath_StructMapStruct(t *testing.T) {
 	type testStruct struct {
 		Foo string
