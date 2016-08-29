@@ -7,6 +7,10 @@ import (
 	"github.com/divideandconquer/go-merge/merge"
 )
 
+func makeStringPtr(v string) *string {
+	return &v
+}
+
 func TestUnit_Merge_BasePath(t *testing.T) {
 	a := ""
 	b := "foo"
@@ -358,6 +362,26 @@ func TestUnit_Merge_AlternatePath_MapEmptyValue(t *testing.T) {
 	expected["test"] = "foo"
 	expected["test2"] = ""
 	expected["test3"] = ""
+
+	ret := merge.Merge(baseData, overrideData)
+
+	if !reflect.DeepEqual(ret, expected) {
+		t.Errorf("Actual ( %#v ) does not match expected ( %#v )", ret, expected)
+	}
+}
+
+func TestUnit_Merge_AlternatePath_MapEmptyValuePtr(t *testing.T) {
+	baseData := make(map[string]*string)
+	baseData["test"] = makeStringPtr("foo")
+	baseData["test2"] = makeStringPtr("")
+
+	overrideData := make(map[string]*string)
+	overrideData["test3"] = makeStringPtr("")
+
+	expected := make(map[string]*string)
+	expected["test"] = makeStringPtr("foo")
+	expected["test2"] = makeStringPtr("")
+	expected["test3"] = makeStringPtr("")
 
 	ret := merge.Merge(baseData, overrideData)
 
