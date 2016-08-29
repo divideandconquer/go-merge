@@ -88,6 +88,12 @@ func mergeRecursive(base, override reflect.Value) reflect.Value {
 					continue
 				}
 
+				// if there is no base value, just set the override
+				if !baseVal.IsValid() {
+					result.SetMapIndex(key, overrideVal)
+					continue
+				}
+
 				// Merge the values and set in the result
 				newVal := mergeRecursive(baseVal, overrideVal)
 				if elementsAreValues && newVal.Kind() == reflect.Ptr {
