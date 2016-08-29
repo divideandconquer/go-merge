@@ -346,6 +346,26 @@ func TestUnit_Merge_AlternatePath_Map(t *testing.T) {
 	}
 }
 
+func TestUnit_Merge_AlternatePath_MapEmptyValue(t *testing.T) {
+	baseData := make(map[string]string)
+	baseData["test"] = "foo"
+	baseData["test2"] = ""
+
+	overrideData := make(map[string]string)
+	overrideData["test3"] = ""
+
+	expected := make(map[string]string)
+	expected["test"] = "foo"
+	expected["test2"] = ""
+	expected["test3"] = ""
+
+	ret := merge.Merge(baseData, overrideData)
+
+	if !reflect.DeepEqual(ret, expected) {
+		t.Errorf("Actual ( %#v ) does not match expected ( %#v )", ret, expected)
+	}
+}
+
 func TestUnit_Merge_AlternatePath_MapInterface(t *testing.T) {
 	base := make(map[string]map[string]interface{})
 	base["Config"] = make(map[string]interface{})
