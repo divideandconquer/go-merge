@@ -3,8 +3,6 @@ package merge
 import (
 	"reflect"
 	"testing"
-
-	"github.com/divideandconquer/go-merge/merge"
 )
 
 func makeStringPtr(v string) *string {
@@ -343,7 +341,7 @@ func TestUnit_Merge_AlternatePath_Map(t *testing.T) {
 	expected["test"] = "foo"
 	expected["test2"] = "override"
 
-	ret := merge.Merge(baseData, overrideData)
+	ret := Merge(baseData, overrideData)
 
 	if !reflect.DeepEqual(ret, expected) {
 		t.Errorf("Actual ( %#v ) does not match expected ( %#v )", ret, expected)
@@ -363,7 +361,7 @@ func TestUnit_Merge_AlternatePath_MapEmptyValue(t *testing.T) {
 	expected["test2"] = ""
 	expected["test3"] = ""
 
-	ret := merge.Merge(baseData, overrideData)
+	ret := Merge(baseData, overrideData)
 
 	if !reflect.DeepEqual(ret, expected) {
 		t.Errorf("Actual ( %#v ) does not match expected ( %#v )", ret, expected)
@@ -383,7 +381,7 @@ func TestUnit_Merge_AlternatePath_MapEmptyValuePtr(t *testing.T) {
 	expected["test2"] = makeStringPtr("")
 	expected["test3"] = makeStringPtr("")
 
-	ret := merge.Merge(baseData, overrideData)
+	ret := Merge(baseData, overrideData)
 
 	if !reflect.DeepEqual(ret, expected) {
 		t.Errorf("Actual ( %#v ) does not match expected ( %#v )", ret, expected)
@@ -407,7 +405,7 @@ func TestUnit_Merge_AlternatePath_MapInterface(t *testing.T) {
 	expected["Config"]["Test"] = "this is a test value"
 	expected["Config"]["Test2"] = "baz"
 
-	ret := merge.Merge(base, override)
+	ret := Merge(base, override)
 
 	if !reflect.DeepEqual(ret, expected) {
 		t.Errorf("Actual ( %#v ) does not match expected ( %#v )", ret, expected)
@@ -433,7 +431,7 @@ func TestUnit_Merge_AlternatePath_MapInterfaceEmptyValue(t *testing.T) {
 	expected["Config"]["Test2"] = "baz"
 	expected["Config"]["Test3"] = nil
 
-	ret := merge.Merge(base, override)
+	ret := Merge(base, override)
 
 	if !reflect.DeepEqual(ret, expected) {
 		t.Errorf("Actual ( %#v ) does not match expected ( %#v )", ret, expected)
